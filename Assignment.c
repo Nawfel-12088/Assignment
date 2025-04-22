@@ -114,14 +114,14 @@ char *pop ()
 // ---------------------------- Assembly Storage Unit ----------------------------
 
 
-char *habitatArray[MAX_HABITATS];
-int habIndex = 0;
+char *HA[MAX_HABITATS];
+int HI = 0;
 
 void addHabitat (char *hab) 
 {
-    if (habIndex < MAX_HABITATS) 
+    if (HI < MAX_HABITATS) 
     {
-        habitatArray[habIndex++] = hab;
+        HA[HI++] = hab;
     } 
     else 
     {
@@ -129,10 +129,10 @@ void addHabitat (char *hab)
 
         for (int i = 1; i < MAX_HABITATS; i++) 
         {
-            habitatArray[i - 1] = habitatArray[i];
+            HA[i - 1] = HA[i];
         }
 
-        habitatArray[MAX_HABITATS - 1] = hab;
+        HA[MAX_HABITATS - 1] = hab;
     }
 }
 
@@ -148,19 +148,19 @@ struct Node
     struct Node *next;
 };
 
-struct Node *damagedHead = NULL;
+struct Node *DH = NULL;
 
 void insertDamaged (char *name) 
 {
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
     strcpy(newNode->name, name);
-    newNode->next = damagedHead;
-    damagedHead = newNode;
+    newNode->next = DH;
+    DH = newNode;
 }
 
 void removeDamaged (char *name) 
 {
-    struct Node *temp = damagedHead;
+    struct Node *temp = DH;
     struct Node *prev = NULL;
     while (temp && strcmp(temp->name, name) != 0) 
     {
@@ -175,7 +175,7 @@ void removeDamaged (char *name)
 
     if (!prev) 
     {
-        damagedHead = temp->next;
+        DH = temp->next;
     }
     else 
     {
@@ -195,7 +195,7 @@ struct DNode
     struct DNode *next;
 };
 
-struct DNode *repairedHead = NULL;
+struct DNode *RH = NULL;
 
 void insertRepaired (char *name) 
 {
@@ -203,19 +203,19 @@ void insertRepaired (char *name)
 
     strcpy(newNode->name, name);
     newNode->prev = NULL;
-    newNode->next = repairedHead;
+    newNode->next = RH;
 
-    if (repairedHead) 
+    if (RH) 
     {
-        repairedHead->prev = newNode;
+        RH->prev = newNode;
     }
 
-    repairedHead = newNode;
+    RH = newNode;
 }
 
 void traverseForward () 
 {
-    struct DNode* temp = repairedHead;
+    struct DNode* temp = RH;
 
     printf("Traverse forward: ");
 
@@ -230,7 +230,7 @@ void traverseForward ()
 
 void traverseBackward () 
 {
-    struct DNode* temp = repairedHead;
+    struct DNode* temp = RH;
 
     while (temp && temp->next) 
     {
@@ -255,39 +255,39 @@ struct CNode
     struct CNode *next;
 };
 
-struct CNode *circularHead = NULL;
+struct CNode *CH = NULL;
 
 void insertCircular (char *name) 
 {
     struct CNode* newNode = (struct CNode *)malloc(sizeof(struct CNode));
     strcpy(newNode->name, name);
-    if (!circularHead) 
+    if (!CH) 
     {
-        circularHead = newNode;
-        newNode->next = circularHead;
+        CH = newNode;
+        newNode->next = CH;
     } 
     else 
     {
-        struct CNode* temp = circularHead;
+        struct CNode* temp = CH;
 
-        while (temp->next != circularHead)
+        while (temp->next != CH)
         {
             temp = temp->next;
         }
 
         temp->next = newNode;
-        newNode->next = circularHead;
+        newNode->next = CH;
     }
 }
 
 void traverseCircular (int times) 
 {
-    if (!circularHead) 
+    if (!CH) 
     {
         return;
     }
 
-    struct CNode* temp = circularHead;
+    struct CNode* temp = CH;
 
     printf("Circular traversal: ");
 
@@ -305,7 +305,7 @@ void traverseCircular (int times)
 
 int main () 
 {
-    // Part A
+    // Part Delivery and Bot
 
 
     printf("=== Part A: Part Delivery and Bot ===\n");
@@ -335,7 +335,7 @@ int main ()
 
     printf("// LIFO fits since 'Vent' (last pushed) is placed last for air sealing after core structures.\n\n");
 
-    // Part B
+    // Assembly Storage Unit
 
 
     printf("=== Part B: Assembly Storage Unit ===\n");
@@ -345,69 +345,62 @@ int main ()
     {
         addHabitat(habitats[i]);
     }
-
     printf("Current Habitats in Storage:\n");
-
+    
     for (int i = 0; i < MAX_HABITATS; i++)
     {
-        printf("%s ", habitatArray[i]);
+        printf("%s ", HA[i]);
     }
-
+    
     printf("\n");
-
-
+    
     // Bonus
-
-
+    
     printf("// Older habitats replaced due to new settlers requiring immediate shelter.\n\n");
 
+    
+    // Damaged Habitat Tracker
 
-    // Part C
-
-
+    
     printf("=== Part C: Damaged Habitat Tracker ===\n");
-
+    
     insertDamaged("Hab3");
     insertDamaged("Hab6");
-
+    
     printf("Damaged List: ");
-
-    struct Node* temp = damagedHead;
-
+    
+    struct Node* temp = DH;
+    
     while (temp) 
     {
         printf("%s -> ", temp->name);
         temp = temp->next;
     }
-
+    
     printf("NULL\n");
     
     removeDamaged("Hab3");
     insertRepaired("Hab3");
-
+    
     traverseForward();
     traverseBackward();
+    
     // Bonus
-
-
+    
     printf("// Hab3’s door cracked due to a dust storm; bots repaired and sealed it airtight.\n\n");
+    
+    
+    // Priority Upgrades
 
-
-    // Part D
-
-
+    
     printf("=== Part D: Priority Upgrades ===\n");
-
     insertCircular("Hab1");
     insertCircular("Hab4");
-
+    
     traverseCircular(2);
-
-
+    
     // Bonus
-
-
     printf("// Hab4 receives a greenhouse dome for sustainable oxygen and crops.\n");
-
+    
     return 0;
 }
