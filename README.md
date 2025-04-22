@@ -55,5 +55,3 @@ The system assumes that older habitats can be reassigned or upgraded when new se
 *Hab4 is getting a greenhouse dome—supporting fresh oxygen and crops to boost colony sustainability!*
 
 ---
-
-## How to Run
