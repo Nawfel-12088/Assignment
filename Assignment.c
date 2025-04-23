@@ -24,7 +24,7 @@ a) Part Delivery and Bot
 ●	Creativity Bonus: Describe (in 2-3 sentences) why LIFO fits (e.g., "Vent" last for air sealing).
 b) Assembly Storage Unit 
 ●	Store habitats in a 5-slot array.
-●	Simulate adding 7 habitats (e.g., "Hab1", "Hab2", ..., "Hab7"). If full, occupy the oldest. Write pseudocode or an algorithm to:
+●	Simulate adding 7 habitats (e.g., "Hab1", "Hab2", ..., "Hab7"). If full, evict the oldest. Write pseudocode or an algorithm to:
 ○	Insert the first 5 habitats.
 ○	Handle overflow for "Hab6" and "Hab7".
 ●	Creativity Bonus: Suggest (in 2-3 sentences) a reason for occupation (e.g., settler arrival).
