@@ -335,21 +335,21 @@ int main ()
 
     printf("=== Part A: Part Delivery and Bot ===\n");
 
-    char* parts[MAX_PARTS] = {"Wall", "Roof", "Door", "Window", "Airlock", "Vent"};
+    char *parts[MP] = {"Wall", "Roof", "Door", "Window", "Airlock", "Vent"};
 
-    for (int i = 0; i < MAX_PARTS; i++)
+    for (int i = 0; i < MP; i++)
     {
         enqueue(parts[i]);
     }
 
-    for (int i = 0; i < MAX_PARTS; i++)
+    for (int i = 0; i < MP; i++)
     {
         push(dequeue());
     }
 
     printf("Construction Order (LIFO): ");
 
-    for (int i = 0; i < MAX_PARTS; i++)
+    for (int i = 0; i < MP; i++)
     {
         printf("%s ", pop());
     }
@@ -365,14 +365,14 @@ int main ()
 
     printf("=== Part B: Assembly Storage Unit ===\n");
 
-    char *habitats[7] = {"Hab1", "Hab2", "Hab3", "Hab4", "Hab5", "Hab6", "Hab7"};
+    char *habi[7] = {"Hab1", "Hab2", "Hab3", "Hab4", "Hab5", "Hab6", "Hab7"};
     for (int i = 0; i < 7; i++)
     {
-        addHabitat(habitats[i]);
+        addHabitat(habi[i]);
     }
     printf("Current Habitats in Storage:\n");
     
-    for (int i = 0; i < MAX_HABITATS; i++)
+    for (int i = 0; i < MH; i++)
     {
         printf("%s ", HA[i]);
     }
