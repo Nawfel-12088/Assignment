@@ -44,17 +44,15 @@ d) Priority Upgrades
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
 
-#define MP 6
+
+#define MP 6     // Max parts
+#define MH 5     // Storage slots
+#define MN 20
 
 
-
-// ---------------------------- Part Delivery and Bot  ----------------------------
-
-
-// Queue
+// ---------- Queue ----------
 
 
 char *queue[MP];
@@ -65,6 +63,7 @@ void enqueue (char *part)
 {
     if (rear == MP - 1) 
     {
+        printf("Queue full! Cannot enqueue %s\n", part);
         return;
     }
 
@@ -86,17 +85,20 @@ char *dequeue ()
     return queue[front++];
 }
 
-// Stack
+
+// ---------- Stack ----------
+
 
 char *stack[MP];
 int top = -1;
 
 void push (char *part) 
 {
-    if (top == MP - 1)
+    if (top == MP - 1) 
     {
+        printf("Stack overflow!\n");
         return;
-    } 
+    }
 
     stack[++top] = part;
 }
@@ -112,16 +114,13 @@ char *pop ()
 }
 
 
-// ---------------------------- Assembly Storage Unit ----------------------------
-
-
-#define MH 5
+// ---------- Assembly Storage (Array) ----------
 
 
 char *HA[MH];
 int HI = 0;
 
-void addHabitat (char *hab) 
+void AddHab (char *hab) 
 {
     if (HI < MH) 
     {
@@ -129,27 +128,26 @@ void addHabitat (char *hab)
     } 
     else 
     {
-        // Occupy oldest
+        // Remove oldest
+
+        free(HA[0]);
 
         for (int i = 1; i < MH; i++) 
         {
-            HA[i - 1] = HA[i];
+            HA[i-1] = HA[i];
         }
 
-        HA[MH - 1] = hab;
+        HA[MH-1] = hab;
     }
 }
 
 
-// ---------------------------- Damaged Habitat Tracker ----------------------------
-
-
-// Singly Linked List
+// ---------- Singly Linked List (Damaged) ----------
 
 
 struct Node 
 {
-    char name[10];
+    char name[MN];
     struct Node *next;
 };
 
@@ -157,65 +155,60 @@ struct Node
 struct Node *DH = NULL;
 
 
-void insertDamaged (char *name) 
+void insDamaged (char *name) 
 {
-    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    struct Node *newNode = malloc(sizeof(*newNode));
 
-    strcpy(newNode->name, name);
+    strcpy (newNode->name, name);
 
     newNode->next = DH;
     DH = newNode;
 }
 
-
-void removeDamaged (char *name) 
+void remDamaged (char *name) 
 {
-    struct Node *temp = DH;
-    struct Node *prev = NULL;
+    struct Node *curr = DH, *prev = NULL;
 
-    while (temp && strcmp(temp->name, name) != 0) 
+    while (curr && strcmp (curr->name, name) != 0) 
     {
-        prev = temp;
-        temp = temp->next;
+        prev = curr; 
+        curr = curr->next;
     }
 
-    if (!temp) 
+    if (!curr) 
     {
         return;
     }
 
     if (!prev) 
     {
-        DH = temp->next;
+        DH = curr->next;
     }
     else 
     {
-        prev->next = temp->next;
+        prev->next = curr->next;
     }
 
-    free(temp);
+    free (curr);
 }
 
 
-// Doubly Linked List
+// ---------- Doubly Linked List (Repaired) ----------
 
 
 struct DNode 
 {
-    char name[10];
-    struct DNode *prev;
-    struct DNode *next;
+    char name[MN];
+    struct DNode *prev, *next;
 };
-
 
 struct DNode *RH = NULL;
 
-
-void insertRepaired (char *name) 
+void insRepair (char *name) 
 {
-    struct DNode* newNode = (struct DNode*)malloc(sizeof(struct DNode));
+    struct DNode *newNode = malloc(sizeof(*newNode));
 
-    strcpy(newNode->name, name);
+    strcpy (newNode->name, name);
 
     newNode->prev = NULL;
     newNode->next = RH;
@@ -228,62 +221,64 @@ void insertRepaired (char *name)
     RH = newNode;
 }
 
-
-void traverseForward () 
+void travForward () 
 {
-    struct DNode* temp = RH;
+    struct DNode *temp = RH;
 
-    printf("Traverse forward: ");
+    printf ("Forward: ");
 
     while (temp) 
-    {
-        printf("%s -> ", temp->name);
-        temp = temp->next;
+    { 
+        printf ("%s -> ", temp->name); 
+        temp = temp->next; 
     }
 
-    printf("NULL\n");
+    printf ("NULL\n");
 }
 
 
-void traverseBackward () 
+void tracBackward () 
 {
-    struct DNode* temp = RH;
+    struct DNode *temp = RH;
 
-    while (temp && temp->next) 
+    if (!temp) 
+    {
+        return;
+    }
+
+    while (temp->next) 
     {
         temp = temp->next;
     }
 
-    printf("Traverse backward: ");
+    printf ("Backward: ");
 
     while (temp) 
-    {
-        printf("%s -> ", temp->name);
-        temp = temp->prev;
+    { 
+        printf ("%s -> ", temp->name); 
+        temp = temp->prev; 
     }
 
-    printf("NULL\n");
+    printf ("NULL\n");
 }
 
 
-// ---------------------------- Damaged Habitat Tracker ----------------------------
+// ---------- Circular Linked List (Priority) ----------
 
 
 struct CNode 
 {
-    char name[10];
+    char name[MN];
     struct CNode *next;
 };
 
-
 struct CNode *CH = NULL;
 
-
-void insertCircular (char *name) 
+void insCir (char *name) 
 {
-    struct CNode* newNode = (struct CNode *)malloc(sizeof(struct CNode));
+    struct CNode *newNode = malloc (sizeof(*newNode));
 
-    strcpy(newNode->name, name);
+    strcpy (newNode->name, name);
 
     if (!CH) 
     {
@@ -292,9 +287,9 @@ void insertCircular (char *name)
     } 
     else 
     {
-        struct CNode* temp = CH;
+        struct CNode *temp = CH;
 
-        while (temp->next != CH)
+        while (temp->next != CH) 
         {
             temp = temp->next;
         }
@@ -304,128 +299,175 @@ void insertCircular (char *name)
     }
 }
 
-
-void traverseCircular (int times) 
+void travCir (int laps) 
 {
     if (!CH) 
     {
         return;
     }
 
-    struct CNode* temp = CH;
+    struct CNode *temp = CH;
 
-    printf("Circular traversal: ");
+    printf ("Circular: ");
 
-    for (int i = 0; i < times * 2; i++) 
+    for (int i = 0; i < laps * 2; i++) 
     {
-        printf("%s -> ", temp->name);
+        printf ("%s -> ", temp->name);
         temp = temp->next;
     }
 
-    printf("...\n");
+    printf ("...\n");
 }
 
-// ---------------------------- MAIN ----------------------------
-
-
-int main () 
+int main() 
 {
-    // Part Delivery and Bot
+    char buffer [MN];
 
 
-    printf("=== Part A: Part Delivery and Bot ===\n");
+    // Part A: User inputs for parts
 
-    char *parts[MP] = {"Wall", "Roof", "Door", "Window", "Airlock", "Vent"};
 
-    for (int i = 0; i < MP; i++)
+    printf ("Enter %d part names for construction:\n", MP);
+
+    char *parts [MP];
+
+    for (int i = 0; i < MP; i++) 
     {
-        enqueue(parts[i]);
+        printf ("Part %d: ", i+1);
+
+        fgets (buffer, MN, stdin);
+        buffer [strcspn(buffer, "\n")] = '\0';
+        parts [i] = strdup(buffer);
+
+        enqueue (parts [i]);
     }
 
-    for (int i = 0; i < MP; i++)
+
+    // Move to stack and build order
+
+
+    for (int i = 0; i < MP; i++) 
     {
-        push(dequeue());
+        push (dequeue ());
     }
 
-    printf("Construction Order (LIFO): ");
+    printf ("\nConstruction Order (LIFO): ");
 
-    for (int i = 0; i < MP; i++)
+    for (int i = 0; i < MP; i++) 
     {
-        printf("%s ", pop());
+        printf ("%s ", pop ());
     }
 
-    printf("\n");
-
-    // Bonus
-
-    printf("// LIFO fits since 'Vent' (last pushed) is placed last for air sealing after core structures.\n\n");
-
-    // Assembly Storage Unit
+    printf ("\n\n");
 
 
-    printf("=== Part B: Assembly Storage Unit ===\n");
+    // Part B: User inputs for habitats
 
-    char *habi[7] = {"Hab1", "Hab2", "Hab3", "Hab4", "Hab5", "Hab6", "Hab7"};
-    for (int i = 0; i < 7; i++)
+
+    int total;
+
+    printf ("Enter total habitats to add (>=%d): ", MH+2);
+
+    scanf ("%d", &total);
+
+    getchar (); // consume newline
+
+    for (int i = 0; i < total; i++) 
     {
-        addHabitat(habi[i]);
+        printf ("Habitat %d: ", i+1);
+
+        fgets (buffer, MN, stdin);
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        char *name = strdup(buffer);
+
+        AddHab (name);
     }
-    printf("Current Habitats in Storage:\n");
-    
-    for (int i = 0; i < MH; i++)
+
+
+    printf ("\nCurrent Storage:\n");
+
+    for (int i = 0; i < MH; i++) 
     {
-        printf("%s ", HA[i]);
+        printf ("%s ", HA[i]);
     }
-    
-    printf("\n");
-    
-    // Bonus
-    
-    printf("// Older habitats replaced due to new settlers requiring immediate shelter.\n\n");
 
-    
-    // Damaged Habitat Tracker
+    printf ("\n\n");
 
-    
-    printf("=== Part C: Damaged Habitat Tracker ===\n");
-    
-    insertDamaged("Hab3");
-    insertDamaged("Hab6");
-    
+
+    // Part C: Damaged habitats
+
+
+    int dcount;
+
+    printf ("Enter number of damaged habitats: ");
+
+    scanf ("%d", &dcount);
+    getchar ();
+
+    for (int i = 0; i < dcount; i++) 
+    {
+        printf ("Damaged habitat #%d: ", i+1);
+
+        fgets (buffer, MN, stdin);
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        insDamaged (buffer);
+    }
+
     printf("Damaged List: ");
-    
-    struct Node* temp = DH;
-    
-    while (temp) 
-    {
-        printf("%s -> ", temp->name);
-        temp = temp->next;
-    }
-    
-    printf("NULL\n");
-    
-    removeDamaged("Hab3");
-    insertRepaired("Hab3");
-    
-    traverseForward();
-    traverseBackward();
-    
-    // Bonus
-    
-    printf("// Hab3’s door cracked due to a dust storm; bots repaired and sealed it airtight.\n\n");
-    
-    
-    // Priority Upgrades
 
-    
-    printf("=== Part D: Priority Upgrades ===\n");
-    insertCircular("Hab1");
-    insertCircular("Hab4");
-    
-    traverseCircular(2);
-    
-    // Bonus
-    printf("// Hab4 receives a greenhouse dome for sustainable oxygen and crops.\n");
-    
+    struct Node *tempN = DH;
+
+    while (tempN) 
+    { 
+        printf ("%s -> ", tempN->name); 
+        tempN = tempN->next; 
+    }
+
+    printf ("NULL\n");
+
+
+    // Repair one habitat
+
+
+    printf ("Enter habitat name to repair: ");
+
+    fgets(buffer, MN, stdin);
+    buffer[strcspn(buffer, "\n")] = '\0';
+
+    remDamaged (buffer);
+
+    insRepair (buffer);
+
+    travForward ();
+
+    tracBackward ();
+
+    printf("\n");
+
+
+    // Part D: Priority upgrades
+
+
+    int pcount;
+
+    printf ("Enter number of priority habitats: ");
+
+    scanf ("%d", &pcount);
+    getchar ();
+
+    for (int i = 0; i < pcount; i++) 
+    {
+        printf ("Priority habitat #%d: ", i+1);
+
+        fgets (buffer, MN, stdin);
+        buffer[strcspn(buffer, "\n")] = '\0';
+        
+        insCir (buffer);
+    }
+
+    travCir (2);
+
     return 0;
 }
