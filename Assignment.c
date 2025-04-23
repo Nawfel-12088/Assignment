@@ -47,8 +47,8 @@ d) Priority Upgrades
 #include <ctype.h>
 #include <string.h>
 
-#define MAX_PARTS 6
-#define MAX_HABITATS 5
+#define MP 6
+
 
 
 // ---------------------------- Part Delivery and Bot  ----------------------------
@@ -56,13 +56,14 @@ d) Priority Upgrades
 
 // Queue
 
-char *queue[MAX_PARTS];
+
+char *queue[MP];
 int front = -1;
 int rear = -1;
 
 void enqueue (char *part) 
 {
-    if (rear == MAX_PARTS - 1) 
+    if (rear == MP - 1) 
     {
         return;
     }
@@ -75,7 +76,7 @@ void enqueue (char *part)
     queue[++rear] = part;
 }
 
-char* dequeue () 
+char *dequeue () 
 {
     if (front == -1 || front > rear) 
     {
@@ -87,12 +88,12 @@ char* dequeue ()
 
 // Stack
 
-char *stack[MAX_PARTS];
+char *stack[MP];
 int top = -1;
 
 void push (char *part) 
 {
-    if (top == MAX_PARTS - 1)
+    if (top == MP - 1)
     {
         return;
     } 
@@ -114,12 +115,15 @@ char *pop ()
 // ---------------------------- Assembly Storage Unit ----------------------------
 
 
-char *HA[MAX_HABITATS];
+#define MH 5
+
+
+char *HA[MH];
 int HI = 0;
 
 void addHabitat (char *hab) 
 {
-    if (HI < MAX_HABITATS) 
+    if (HI < MH) 
     {
         HA[HI++] = hab;
     } 
@@ -127,12 +131,12 @@ void addHabitat (char *hab)
     {
         // Occupy oldest
 
-        for (int i = 1; i < MAX_HABITATS; i++) 
+        for (int i = 1; i < MH; i++) 
         {
             HA[i - 1] = HA[i];
         }
 
-        HA[MAX_HABITATS - 1] = hab;
+        HA[MH - 1] = hab;
     }
 }
 
@@ -142,26 +146,33 @@ void addHabitat (char *hab)
 
 // Singly Linked List
 
+
 struct Node 
 {
     char name[10];
     struct Node *next;
 };
 
+
 struct Node *DH = NULL;
+
 
 void insertDamaged (char *name) 
 {
     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+
     strcpy(newNode->name, name);
+
     newNode->next = DH;
     DH = newNode;
 }
+
 
 void removeDamaged (char *name) 
 {
     struct Node *temp = DH;
     struct Node *prev = NULL;
+
     while (temp && strcmp(temp->name, name) != 0) 
     {
         prev = temp;
@@ -185,6 +196,7 @@ void removeDamaged (char *name)
     free(temp);
 }
 
+
 // Doubly Linked List
 
 
@@ -195,13 +207,16 @@ struct DNode
     struct DNode *next;
 };
 
+
 struct DNode *RH = NULL;
+
 
 void insertRepaired (char *name) 
 {
     struct DNode* newNode = (struct DNode*)malloc(sizeof(struct DNode));
 
     strcpy(newNode->name, name);
+
     newNode->prev = NULL;
     newNode->next = RH;
 
@@ -212,6 +227,7 @@ void insertRepaired (char *name)
 
     RH = newNode;
 }
+
 
 void traverseForward () 
 {
@@ -227,6 +243,7 @@ void traverseForward ()
 
     printf("NULL\n");
 }
+
 
 void traverseBackward () 
 {
@@ -248,19 +265,26 @@ void traverseBackward ()
     printf("NULL\n");
 }
 
+
 // ---------------------------- Damaged Habitat Tracker ----------------------------
+
+
 struct CNode 
 {
     char name[10];
     struct CNode *next;
 };
 
+
 struct CNode *CH = NULL;
+
 
 void insertCircular (char *name) 
 {
     struct CNode* newNode = (struct CNode *)malloc(sizeof(struct CNode));
+
     strcpy(newNode->name, name);
+
     if (!CH) 
     {
         CH = newNode;
@@ -279,6 +303,7 @@ void insertCircular (char *name)
         newNode->next = CH;
     }
 }
+
 
 void traverseCircular (int times) 
 {
